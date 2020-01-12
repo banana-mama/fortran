@@ -14,7 +14,7 @@ function count(object) {
 
 //
 function isset(value) {
-    return (value !== undefined);
+    return ((value !== undefined) && (value !== null));
 }
 
 
@@ -169,27 +169,37 @@ class Canvas {
             let data = SxCallback(positions, y);
             let Sx = data['Sx'];
 
+            let Sr = null;
             if (isset(data['Sr'])) {
-                let Sr = data['Sr'];
+                Sr = data['Sr'];
             }
+
+            let Sg = null;
             if (isset(data['Sg'])) {
-                let Sg = data['Sg'];
+                Sg = data['Sg'];
             }
+
+            let Sb = null;
             if (isset(data['Sb'])) {
-                let Sb = data['Sb'];
+                Sb = data['Sb'];
             }
 
             let yPlus05 = (y + 0.5);
             let Ex = this.getIntersectionPoint(positions['A'], positions['C'], yPlus05);
 
+            let Er = null;
             if (isset(positions['A']['r']) && isset(positions['C']['r'])) {
-                let Er = this.getIntersectionPoint(positions['A'], positions['C'], yPlus05, 'r');
+                Er = this.getIntersectionPoint(positions['A'], positions['C'], yPlus05, 'r');
             }
+
+            let Eg = null;
             if (isset(positions['A']['g']) && isset(positions['C']['g'])) {
-                let Eg = this.getIntersectionPoint(positions['A'], positions['C'], yPlus05, 'g');
+                Eg = this.getIntersectionPoint(positions['A'], positions['C'], yPlus05, 'g');
             }
+
+            let Eb = null;
             if (isset(positions['A']['b']) && isset(positions['C']['b'])) {
-                let Eb = this.getIntersectionPoint(positions['A'], positions['C'], yPlus05, 'b');
+                Eb = this.getIntersectionPoint(positions['A'], positions['C'], yPlus05, 'b');
             }
 
             if (Sx > Ex) {
@@ -199,7 +209,7 @@ class Canvas {
                 Ex = object['b'];
             }
             Sx = Math.floor(Sx);
-            Ex = Math.floor(Ex);
+            Ex = Math.ceil(Ex);
 
             for (let x = Sx; x <= Ex; x++) {
 
@@ -207,7 +217,9 @@ class Canvas {
 
                     let dividend = ((x + 0.5) - Sx);
                     let divider = (Ex - Sx);
-                    if (Ex === Sx) divider = 1;
+                    if (Ex === Sx) {
+                        divider = 1;
+                    }
 
                     let r = (Sr + ((Er - Sr) * (dividend / divider)));
                     let g = (Sg + ((Eg - Sg) * (dividend / divider)));
@@ -229,9 +241,10 @@ class Canvas {
     // TODO
     getIntersectionPoint(positionA, positionB, value, key) {
         if (key === undefined) {
-            key = [255, 255, 255];
+            key = 'x';
         }
 
+        value = Math.trunc(value);
         let dividend = (value - positionA['y']);
         let divider = (positionB['y'] - positionA['y']);
 
