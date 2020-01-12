@@ -1,4 +1,4 @@
-console.log(1337);
+// console.log('start...');
 // throw new Error();
 
 
@@ -12,7 +12,7 @@ function count(object) {
 }
 
 
-// TODO
+//
 function isset(value) {
     return (value !== undefined);
 }
@@ -110,7 +110,7 @@ class Canvas {
         let colorsIsset = null;
         if (isset(colors[0])) colorsIsset = colors[0];
 
-        let roundBy =  Math.round(positions['B']['y']);
+        let roundBy = Math.round(positions['B']['y']);
         this.setTriangleHalf(positions, Sy, roundBy, function (positions, y) {
             y = (y + 0.5);
 
@@ -217,7 +217,7 @@ class Canvas {
 
                 }
 
-                let pixelPositions = {'x': x, 'y' : y};
+                let pixelPositions = {'x': x, 'y': y};
                 this.setPixel(pixelPositions, color);
 
             }
@@ -247,6 +247,32 @@ class Canvas {
     }
 
 
+    //
+    getHeight() {
+        return this.size['h'];
+    }
+
+
+    //
+    getWidth() {
+        return this.size['w'];
+    }
+
+
+    //
+    getPixelColors(position) {
+        let colors = [];
+
+        let colorPairsCount = count(this.background);
+        for (let i = 0; i < colorPairsCount; i++) {
+            let index = this.calculateIndex(position, i);
+            colors.push(this.rawData[index]);
+        }
+
+        return colors.join(', ')
+    }
+
+
 }
 
 
@@ -263,3 +289,33 @@ let C = {'x': 30, 'y': 35};
 let triangleColors = [[78, 205, 196], [85, 98, 112]];
 
 canvas.setTriangle(A, B, C, triangleColors);
+
+
+// Вывод
+
+
+let canvasHeight = canvas.getHeight();
+let canvasWidth = canvas.getWidth();
+
+for (let y = 1; y <= canvasHeight; y++) {
+    let text = '';
+    let arguments = [];
+
+    for (let x = 1; x <= canvasWidth; x++) {
+
+        let pixelPosition = {'x': x, 'y': y};
+        let color = canvas.getPixelColors(pixelPosition);
+
+        text += '%c•';
+        arguments.push('color: rgb(' + color + ')');
+
+    }
+
+    text += ('%c' + y);
+    arguments.push('color: rgb(255, 255, 255)');
+    arguments.unshift(text);
+    console['log'].apply(this, arguments);
+}
+
+
+//

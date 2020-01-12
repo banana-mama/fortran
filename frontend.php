@@ -2,6 +2,7 @@
 
 use classes\Canvas;
 
+
 /**
  * @var Canvas $canvas
  */
@@ -20,11 +21,17 @@ use classes\Canvas;
 </head>
 <body>
 
+<?php
+$canvasHeight = $canvas->getHeight();
+$canvasWidth = $canvas->getWidth();
+?>
+
 <section>
-  <?php for ($y = 1; $y <= $canvas->getHeight(); $y++): ?>
+  <?php for ($y = 1; $y <= $canvasHeight; $y++): ?>
       <p>
-        <?php for ($x = 1; $x <= $canvas->getWidth(); $x++): ?>
-          <?php $color = $canvas->getPixelColors(['x' => $x, 'y' => $y]); ?>
+        <?php for ($x = 1; $x <= $canvasWidth; $x++): ?>
+          <?php $pixelPosition = ['x' => $x, 'y' => $y]; ?>
+          <?php $color = $canvas->getPixelColors($pixelPosition); ?>
             <span style="color: rgb(<?= $color ?>);">•</span>
         <?php endfor; ?>
       </p>
