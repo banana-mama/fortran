@@ -321,14 +321,16 @@ class Canvas
 
 }
 
-$canvas = new Canvas(['w' => 40, 'h' => 40], [255, 107, 107]);
-$canvas->setTriangle(
-  ['x' => 30, 'y' => 5],
-  ['x' => 10, 'y' => 20],
-  ['x' => 30, 'y' => 35],
-  [[78, 205, 196], [85, 98, 112]]
-);
+$canvasSize = ['w' => 40, 'h' => 40];
+$canvasBackgroundColor = [255, 107, 107];
+$canvas = new Canvas($canvasSize, $canvasBackgroundColor);
+
+$A = ['x' => 30, 'y' => 5];
+$B = ['x' => 10, 'y' => 20];
+$C = ['x' => 30, 'y' => 35];
+$triangleColors = [[78, 205, 196], [85, 98, 112]];
+
+$canvas->setTriangle($A, $B, $C, $triangleColors);
 
 ### •
-
 require_once ('./frontend.php');

@@ -1,5 +1,5 @@
 console.log(1337);
-throw new Error();
+// throw new Error();
 
 
 //
@@ -60,7 +60,7 @@ class Canvas {
     setPixel(position, pixelColor) {
         for (let i = 0; i < count(pixelColor); i++) {
             let index = this.calculateIndex(position, i);
-            this.rawData[index] = this.pixelColor(i);
+            this.rawData[index] = pixelColor[i];
         }
     }
 
@@ -80,7 +80,6 @@ class Canvas {
 
     //
     setTriangle(positionA, positionB, positionC, colors) {
-
         if (colors === undefined) {
             colors = [[255, 255, 255], [255, 255, 255]];
         }
@@ -104,6 +103,8 @@ class Canvas {
         let Sy = Math.floor(positions['A']['y']);
         let Ey = Math.ceil(positions['C']['y']);
 
+        let self = this;
+
         // Рисуем половинки треугольника
 
         let colorsIsset = null;
@@ -113,16 +114,16 @@ class Canvas {
         this.setTriangleHalf(positions, Sy, roundBy, function (positions, y) {
             y = (y + 0.5);
 
-            let data = {'Sx': this.getIntersectionPoint(positions['A'], positions['B'], y)};
+            let data = {'Sx': self.getIntersectionPoint(positions['A'], positions['B'], y)};
 
             if (isset(positions['A']['r']) && isset(positions['B']['r'])) {
-                data['Sx'] = this.getIntersectionPoint(positions['A'], positions['B'], y, 'r');
+                data['Sx'] = self.getIntersectionPoint(positions['A'], positions['B'], y, 'r');
             }
             if (isset(positions['A']['g']) && isset(positions['B']['g'])) {
-                data['Sg'] = this.getIntersectionPoint(positions['A'], positions['B'], y, 'g');
+                data['Sg'] = self.getIntersectionPoint(positions['A'], positions['B'], y, 'g');
             }
             if (isset(positions['A']['b']) && isset(positions['B']['b'])) {
-                data['Sb'] = this.getIntersectionPoint(positions['A'], positions['B'], y, 'b');
+                data['Sb'] = self.getIntersectionPoint(positions['A'], positions['B'], y, 'b');
             }
 
             return data;
@@ -137,16 +138,16 @@ class Canvas {
         this.setTriangleHalf(positions, roundBy, Ey, function (positions, y) {
             y = (y + 0.5);
 
-            let data = {'Sx': this.getIntersectionPoint(positions['B'], positions['C'], y)};
+            let data = {'Sx': self.getIntersectionPoint(positions['B'], positions['C'], y)};
 
             if (isset(positions['B']['r']) && isset(positions['C']['r'])) {
-                data['Sx'] = this.getIntersectionPoint(positions['B'], positions['C'], y, 'r');
+                data['Sx'] = self.getIntersectionPoint(positions['B'], positions['C'], y, 'r');
             }
             if (isset(positions['B']['g']) && isset(positions['C']['g'])) {
-                data['Sg'] = this.getIntersectionPoint(positions['B'], positions['C'], y, 'g');
+                data['Sg'] = self.getIntersectionPoint(positions['B'], positions['C'], y, 'g');
             }
             if (isset(positions['A']['b']) && isset(positions['B']['b'])) {
-                data['Sb'] = this.getIntersectionPoint(positions['B'], positions['C'], y, 'b');
+                data['Sb'] = self.getIntersectionPoint(positions['B'], positions['C'], y, 'b');
             }
 
             return data;
@@ -168,9 +169,15 @@ class Canvas {
             let data = SxCallback(positions, y);
             let Sx = data['Sx'];
 
-            if (isset(data['Sr'])) let Sr = data['Sr'];
-            if (isset(data['Sg'])) let Sg = data['Sg'];
-            if (isset(data['Sb'])) let Sb = data['Sb'];
+            if (isset(data['Sr'])) {
+                let Sr = data['Sr'];
+            }
+            if (isset(data['Sg'])) {
+                let Sg = data['Sg'];
+            }
+            if (isset(data['Sb'])) {
+                let Sb = data['Sb'];
+            }
 
             let yPlus05 = (y + 0.5);
             let Ex = this.getIntersectionPoint(positions['A'], positions['C'], yPlus05);
@@ -241,3 +248,18 @@ class Canvas {
 
 
 }
+
+
+//
+
+
+let canvasSize = {'w': 40, 'h': 40};
+let canvasBackgroundColor = [255, 107, 107];
+let canvas = new Canvas(canvasSize, canvasBackgroundColor);
+
+let A = {'x': 30, 'y': 5};
+let B = {'x': 10, 'y': 20};
+let C = {'x': 30, 'y': 35};
+let triangleColors = [[78, 205, 196], [85, 98, 112]];
+
+canvas.setTriangle(A, B, C, triangleColors);
