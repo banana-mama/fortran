@@ -1,9 +1,6 @@
 <?php
 
 
-namespace classes;
-
-
 class Canvas
 {
 
@@ -25,7 +22,7 @@ class Canvas
 
 
   /**
-   * Rasterizer constructor.
+   * Canvas constructor.
    *
    * @param  array  $size
    * @param  array  $background
@@ -45,6 +42,42 @@ class Canvas
 
 
   ### public
+
+
+  /**
+   * @return integer
+   */
+  public function getHeight(): int
+  {
+    return $this->size['h'];
+  }
+
+
+  /**
+   * @return integer
+   */
+  public function getWidth(): int
+  {
+    return $this->size['w'];
+  }
+
+
+  /**
+   * @param  array  $position
+   *
+   * @return string
+   */
+  public function getPixelColors(array $position): string
+  {
+    $colors = [];
+
+    for ($i = 0; $i < count($this->background); $i++) {
+      $index = $this->calculateIndex($position, $i);
+      $colors[] = $this->rawData[$index];
+    }
+
+    return implode(', ', $colors);
+  }
 
 
   /**
@@ -99,24 +132,33 @@ class Canvas
 
     ### Рисуем половинки треугольника
 
-    $this->setTriangleHalf($positions, $Sy, round($positions['B']['y']), function ($positions, $y) {
-      $data = ['Sx' => $this->getIntersectionPoint($positions['A'], $positions['B'], ($y + 0.5))];
+    $colorsIsset = ($colors[0] ?? null);
+    $roundBy = round($positions['B']['y']);
 
-      if (isset($positions['A']['r']) && isset($positions['B']['r']))
-        $data['Sr'] = $this->getIntersectionPoint($positions['A'], $positions['B'], ($y + 0.5), 'r');
+    $this->setTriangleHalf($positions, $Sy, $roundBy, function ($positions, $y) {
+      $y = ($y + 0.5);
 
-      if (isset($positions['A']['g']) && isset($positions['B']['g']))
-        $data['Sg'] = $this->getIntersectionPoint($positions['A'], $positions['B'], ($y + 0.5), 'g');
+      $data = ['Sx' => $this->getIntersectionPoint($positions['A'], $positions['B'], $y)];
 
-      if (isset($positions['A']['b']) && isset($positions['B']['b']))
-        $data['Sb'] = $this->getIntersectionPoint($positions['A'], $positions['B'], ($y + 0.5), 'b');
+      if (isset($positions['A']['r']) && isset($positions['B']['r'])) {
+        $data['Sr'] = $this->getIntersectionPoint($positions['A'], $positions['B'], $y, 'r');
+      }
+      if (isset($positions['A']['g']) && isset($positions['B']['g'])) {
+        $data['Sg'] = $this->getIntersectionPoint($positions['A'], $positions['B'], $y, 'g');
+      }
+      if (isset($positions['A']['b']) && isset($positions['B']['b'])) {
+        $data['Sb'] = $this->getIntersectionPoint($positions['A'], $positions['B'], $y, 'b');
+      }
 
       return $data;
-    }, ($colors[0] ?? null));
+    }, $colorsIsset);
 
     #
 
-    $this->setTriangleHalf($positions, (round($positions['B']['y']) + 1), $Ey, function ($positions, $y) {
+    $colorsIsset = ($colors[1] ?? null);
+    $roundBy = ($roundBy + 1);
+
+    $this->setTriangleHalf($positions, $roundBy, $Ey, function ($positions, $y) {
       $data = ['Sx' => $this->getIntersectionPoint($positions['B'], $positions['C'], ($y + 0.5))];
 
       if (isset($positions['B']['r']) && isset($positions['C']['r']))
@@ -129,7 +171,7 @@ class Canvas
         $data['Sb'] = $this->getIntersectionPoint($positions['B'], $positions['C'], ($y + 0.5), 'b');
 
       return $data;
-    }, ($colors[1] ?? null));
+    }, $colorsIsset);
 
     ###
 
@@ -148,9 +190,12 @@ class Canvas
     $height = $this->size['h'];
     $width = $this->size['w'];
 
-    for ($y = 1; $y <= $height; $y++)
-      for ($x = 1; $x <= $width; $x++)
-        $this->setPixel(['x' => $x, 'y' => $y], $this->background);
+    for ($y = 1; $y <= $height; $y++) {
+      for ($x = 1; $x <= $width; $x++) {
+        $xy = ['x' => $x, 'y' => $y];
+        $this->setPixel($xy, $this->background);
+      }
+    }
 
   }
 
@@ -216,18 +261,22 @@ class Canvas
       if (isset($data['Sg'])) $Sg = $data['Sg'];
       if (isset($data['Sb'])) $Sb = $data['Sb'];
 
-      $Ex = $this->getIntersectionPoint($positions['A'], $positions['C'], ($y + 0.5));
+      $yPlus05 = ($y + 0.5);
+      $Ex = $this->getIntersectionPoint($positions['A'], $positions['C'], $yPlus05);
 
-      if (isset($positions['A']['r']) && isset($positions['C']['r']))
-        $Er = $this->getIntersectionPoint($positions['A'], $positions['C'], ($y + 0.5), 'r');
+      if (isset($positions['A']['r']) && isset($positions['C']['r'])) {
+        $Er = $this->getIntersectionPoint($positions['A'], $positions['C'], $yPlus05, 'r');
+      }
+      if (isset($positions['A']['g']) && isset($positions['C']['g'])) {
+        $Eg = $this->getIntersectionPoint($positions['A'], $positions['C'], $yPlus05, 'g');
+      }
+      if (isset($positions['A']['b']) && isset($positions['C']['b'])) {
+        $Eb = $this->getIntersectionPoint($positions['A'], $positions['C'], $yPlus05, 'b');
+      }
 
-      if (isset($positions['A']['g']) && isset($positions['C']['g']))
-        $Eg = $this->getIntersectionPoint($positions['A'], $positions['C'], ($y + 0.5), 'g');
-
-      if (isset($positions['A']['b']) && isset($positions['C']['b']))
-        $Eb = $this->getIntersectionPoint($positions['A'], $positions['C'], ($y + 0.5), 'b');
-
-      if ($Sx > $Ex) $this->swap($Sx, $Ex);
+      if ($Sx > $Ex) {
+        $this->swap($Sx, $Ex);
+      }
       $Sx = floor($Sx);
       $Ex = ceil($Ex);
 
@@ -236,7 +285,8 @@ class Canvas
         if (isset($Sr) && isset($Sg) && isset($Sb) && isset($Er) && isset($Eg) && isset($Eb)) {
 
           $dividend = (($x + 0.5) - $Sx);
-          $divider = (($Ex === $Sx) ? 1 : ($Ex - $Sx));
+          $divider = ($Ex - $Sx);
+          if ($Ex === $Sx) $divider = 1;
 
           $r = ($Sr + (($Er - $Sr) * ($dividend / $divider)));
           $g = ($Sg + (($Eg - $Sg) * ($dividend / $divider)));
@@ -246,7 +296,8 @@ class Canvas
 
         }
 
-        $this->setPixel(['x' => $x, 'y' => $y], $color);
+        $pixelPositions = ['x' => $x, 'y' => $y];
+        $this->setPixel($pixelPositions, $color);
 
       }
 
@@ -277,3 +328,7 @@ $canvas->setTriangle(
   ['x' => 30, 'y' => 35],
   [[78, 205, 196], [85, 98, 112]]
 );
+
+### •
+
+require_once ('./frontend.php');
